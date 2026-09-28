@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<title>Agenda Digital - Móvil</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/t0ymbp1.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #f6f3fb;
+  --paper: #fffdfd;
+  --paper-2: #faf8ff;
+  --primary: #9a82d8;
+  --primary-soft: #e9e1ff;
+  --primary-dark: #6953a5;
+  --text: #403b4b;
+  --muted: #918a9d;
+  --line: #e9e3ef;
+  --accent: #f3dce8;
+  --shadow: 0 8px 25px rgba(79, 65, 103, .07);
+  --radius: 16px;
+  --header-h: 56px;
+  --bottom-nav-h: 60px;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: "Nunito", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+button, input, textarea {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+.app {
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* TOPBAR */
+.topbar {
+  height: var(--header-h);
+  flex: 0 0 var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, .85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+  z-index: 20;
+}
+
+.date-picker {
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+  color: var(--text);
+  padding: 0 8px;
+  font-weight: 700;
+  font-size: 13px;
+  outline: none;
+}
+
+.today-btn {
+  padding: 6px 12px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.header-spacer { flex: 1; }
+
+.sync-status {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+  font-weight: 600;
+}
+
+/* SUBHEADER (FORMATO DE TEXTO) */
+.tool-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.tool-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fmt-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.apply-target-btn {
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: #f1edf6;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.apply-target-btn.active {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+.palette {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px var(--line);
+  cursor: pointer;
+}
+
+.color-dot.active {
+  box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px white;
+}
+
+/* CONTENT & VIEWS */
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.view {
+  height: 100%;
+  width: 100%;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.view.active {
+  display: flex;
+}
+
+/* VISTA DE NOTAS DIARIAS */
+.notes-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  height: 100%;
+}
+
+.card-header-mobile {
+  padding: 6px 4px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-title-mobile {
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--primary-dark);
+}
+
+.week-strip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.day-chip {
+  flex: 1;
+  min-width: 42px;
+  padding: 6px 4px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  background: #f6f3f8;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.day-chip strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.day-chip.active {
+  background: var(--primary);
+  color: white;
+}
+
+.day-chip.active strong {
+  color: white;
+}
+
+.notes-workspace {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      var(--line) 32px,
+      transparent 33px
+    ),
+    var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.notes-editor {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding: 10px 14px;
+  outline: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 32px;
+  font-size: 15px;
+  caret-color: var(--primary-dark);
+}
+
+/* VISTA TAREAS DIARIAS */
+.todo-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  height: 100%;
+}
+
+.todo-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.todo-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.todo-check {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+  flex: 0 0 auto;
+}
+
+.todo-text {
+  flex: 1;
+  min-width: 0;
+  outline: none;
+  font-size: 15px;
+}
+
+.todo-item.done .todo-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.order-btn {
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 12px;
+}
+
+.delete-task {
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  width: 28px;
+  height: 28px;
+}
+
+.add-task-row {
+  padding: 10px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 7px;
+}
+
+.add-task-input {
+  flex: 1;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 0 12px;
+  outline: none;
+  background: var(--paper-2);
+}
+
+.add-task-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: var(--primary);
+  color: white;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+/* VISTAS SEMANA Y MES */
+.week-view, .month-view {
+  padding: 10px;
+  overflow: auto;
+  height: 100%;
+}
+
+.week-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.week-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.week-card-header {
+  padding: 8px 12px;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 800;
+  color: var(--primary-dark);
+}
+
+.mini-note {
+  min-height: 60px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  outline: none;
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.month-heading {
+  color: var(--muted);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 0;
+}
+
+.month-cell {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-height: 65px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.month-cell.empty { background: transparent; border-color: transparent; }
+.month-cell.today { border: 2px solid var(--primary); }
+
+.month-date {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--primary-dark);
+}
+
+.month-note {
+  font-size: 10px;
+  line-height: 1.2;
+  overflow: hidden;
+  outline: none;
+}
+
+/* NAVEGACIÓN INFERIOR (BOTTOM NAV) */
+.bottom-nav {
+  height: var(--bottom-nav-h);
+  flex: 0 0 var(--bottom-nav-h);
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 4px;
+  z-index: 20;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  height: 100%;
+}
+
+.nav-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.nav-item.active {
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+/* SIDEBAR/MODAL EN MÓVIL */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(47, 38, 58, .4);
+  z-index: 50;
+  display: none;
+}
+.overlay.open { display: block; }
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(320px, 85vw);
+  background: var(--paper);
+  z-index: 51;
+  transform: translateX(100%);
+  transition: transform .25s ease;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar.open { transform: translateX(0); }
+
+.sidebar-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.section { margin-bottom: 20px; }
+.section-title { font-size: 12px; font-weight: 800; color: var(--primary-dark); margin-bottom: 8px; }
+
+.theme-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.theme-option { width: 100%; padding: 8px; border-radius: 10px; border: 1px solid var(--line); background: white; text-align: left; }
+.theme-option.active { border: 2px solid var(--primary); }
+.theme-swatch { width: 100%; height: 16px; border-radius: 5px; margin-bottom: 4px; }
+
+.general-task { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.general-task .task-name { flex: 1; font-size: 14px; }
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <input type="date" id="datePicker" class="date-picker">
+    <button class="today-btn" id="todayBtn">Hoy</button>
+    <div class="header-spacer"></div>
+    <div class="sync-status" id="syncStatus">Local</div>
+  </header>
+
+  <!-- BARRA DE HERRAMIENTAS (FORMATO) -->
+  <div class="tool-row" id="toolRow">
+    <div class="tool-group">
+      <button class="fmt-btn" id="btnBold">B</button>
+      <button class="fmt-btn" id="btnItalic"><i>I</i></button>
+      <button class="fmt-btn" id="btnUnderline"><u>U</u></button>
+      <button class="fmt-btn" id="btnStrike"><s>S</s></button>
+    </div>
+    <div class="tool-group">
+      <button class="apply-target-btn active" id="targetTextBtn">Texto</button>
+      <button class="apply-target-btn" id="targetBgBtn">Fondo</button>
+    </div>
+    <div class="palette" id="palette"></div>
+  </div>
+
+  <!-- CONTENIDO -->
+  <main class="content">
+
+    <!-- 1. PESTAÑA NOTAS DIARIAS -->
+    <section class="view active" id="notesView">
+      <div class="notes-container">
+        <div class="card-header-mobile">
+          <div class="card-title-mobile" id="dailyTitle">Notas del día</div>
+          <div class="week-strip" id="weekStrip"></div>
+        </div>
+        <div class="notes-workspace">
+          <div id="notesEditor" class="notes-editor" contenteditable="true" spellcheck="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. PESTAÑA TAREAS DIARIAS -->
+    <section class="view" id="tasksView">
+      <div class="todo-container">
+        <div class="card-header-mobile">
+          <div class="card-title-mobile" id="todoDateLabel">Tareas del día</div>
+        </div>
+        <div class="todo-card">
+          <div class="todo-list" id="todoList"></div>
+          <div class="add-task-row">
+            <input id="taskInput" class="add-task-input" type="text" placeholder="Añadir tarea..." autocomplete="off">
+            <button id="addTaskBtn" class="add-task-btn">+</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. PESTAÑA SEMANA -->
+    <section class="view" id="weeklyView">
+      <div class="week-view">
+        <div class="week-grid" id="weekGrid"></div>
+      </div>
+    </section>
+
+    <!-- 4. PESTAÑA MES -->
+    <section class="view" id="monthlyView">
+      <div class="month-view">
+        <div class="month-grid" id="monthGrid"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- NAVEGACIÓN INFERIOR -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-target="notesView">
+      <img src="https://i.imgur.com/hDXP5zA.png" alt="Notas" class="nav-icon">
+      <span>Notas</span>
+    </button>
+    <button class="nav-item" data-target="tasksView">
+      <img src="https://i.imgur.com/FhGyKRe.png" alt="Tareas" class="nav-icon">
+      <span>Tareas</span>
+    </button>
+    <button class="nav-item" data-target="weeklyView">
+      <img src="https://i.imgur.com/jXdQvUV.png" alt="Semana" class="nav-icon">
+      <span>Semana</span>
+    </button>
+    <button class="nav-item" data-target="monthlyView">
+      <img src="https://i.imgur.com/YVo2oKa.png" alt="Mes" class="nav-icon">
+      <span>Mes</span>
+    </button>
+
+    <button class="nav-item" id="openSidebarBtn">
+      <img src="https://i.imgur.com/M2wLkEO.png" alt="Menú" class="nav-icon">
+      <span>Menú</span>
+    </button>
+  </nav>
+</div>
+
+<!-- SIDEBAR DE AJUSTES -->
+<div class="overlay" id="sidebarOverlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <strong style="font-size:16px;">Menú y Ajustes</strong>
+    <div class="header-spacer"></div>
+    <button id="closeSidebar" style="background:transparent; font-size:20px;">×</button>
+  </div>
+
+  <div class="sidebar-content">
+    <section class="section">
+      <div class="section-title">Tareas Sin Fecha</div>
+      <div id="generalTasks"></div>
+      <div class="add-task-row" style="padding: 6px 0; border:0;">
+        <input id="generalTaskInput" class="add-task-input" type="text" placeholder="Nueva tarea...">
+        <button id="addGeneralTaskBtn" class="add-task-btn">+</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">Temas</div>
+      <div class="theme-list" id="themeList"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">Sincronización</div>
+      <button id="googleSync" style="width:100%; height:40px; background:var(--primary); color:white; border-radius:10px; font-weight:700;">
+        Sincronizar ahora
+      </button>
+    </section>
+  </div>
+</aside>
+
+<script>
+"use strict";
+
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaEc8fbeqndv7qRWlNapUbcTwPZa7DsY76Uc2licXcVEgaMOHTVJkOlNOUkJV9vrew/exec";
+
+const DEFAULT_THEMES = [
+  { id: "lila", name: "Lila", primary: "#9a82d8", soft: "#e9e1ff", dark: "#6953a5", bg: "#f6f3fb" },
+  { id: "verde", name: "Verde", primary: "#72a987", soft: "#dff0e4", dark: "#4d7e60", bg: "#f2f8f3" },
+  { id: "rosa", name: "Rosa", primary: "#d48da8", soft: "#f6e0e8", dark: "#9b5872", bg: "#fbf4f7" },
+  { id: "azul", name: "Azul", primary: "#78a6c8", soft: "#dcecf7", dark: "#507b9d", bg: "#f1f7fb" }
+];
+
+const STORAGE_KEY = "agenda_digital_data_v2";
+
+let state = {
+  selectedDate: todayKey(),
+  selectedColor: "#8d79c7",
+  selectedBgColor: "#ffffff",
+  applyTarget: "text",
+  palette: [
+    { name: "Lila", color: "#8d79c7" },
+    { name: "Azul", color: "#70a3c7" },
+    { name: "Verde", color: "#70aa86" },
+    { name: "Rosa", color: "#cf88a5" },
+    { name: "Melocotón", color: "#dca17e" },
+    { name: "Amarillo", color: "#fce38a" }
+  ],
+  themeId: "lila",
+  themes: [],
+  days: {},
+  generalTasks: []
+};
+
+function todayKey() { return formatDateKey(new Date()); }
+
+function formatDateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function parseKey(key) {
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function shortDay(date) {
+  return date.toLocaleDateString("es-ES", { weekday: "short" }).replace(".", "");
+}
+
+function longDate(date) {
+  return date.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
+}
+
+function getDayData(key) {
+  if (!state.days[key]) {
+    state.days[key] = { text: "", html: "", tasks: [] };
+  }
+  return state.days[key];
+}
+
+/* LOCAL STORAGE */
+function saveLocal() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (err) { console.warn(err); }
+}
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    state = {
+      ...state,
+      ...parsed,
+      palette: Array.isArray(parsed.palette) ? parsed.palette : state.palette,
+      themes: Array.isArray(parsed.themes) ? parsed.themes : [],
+      days: parsed.days || {},
+      generalTasks: Array.isArray(parsed.generalTasks) ? parsed.generalTasks : []
+    };
+  } catch (err) { console.warn(err); }
+}
+
+/* TEMAS */
+function getAllThemes() {
+  return [...DEFAULT_THEMES, ...(state.themes || [])];
+}
+
+function applyTheme() {
+  const theme = getAllThemes().find(t => t.id === state.themeId) || DEFAULT_THEMES[0];
+  document.documentElement.style.setProperty("--primary", theme.primary);
+  document.documentElement.style.setProperty("--primary-soft", theme.soft);
+  document.documentElement.style.setProperty("--primary-dark", theme.dark);
+  document.documentElement.style.setProperty("--bg", theme.bg);
+}
+
+/* RENDER */
+function render() {
+  applyTheme();
+  renderPalette();
+  renderDaily();
+  renderWeek();
+  renderMonth();
+  renderGeneralTasks();
+  renderThemes();
+
+  document.getElementById("datePicker").value = state.selectedDate;
+  document.getElementById("targetTextBtn").classList.toggle("active", state.applyTarget === "text");
+  document.getElementById("targetBgBtn").classList.toggle("active", state.applyTarget === "bg");
+}
+
+function renderDaily() {
+  const day = getDayData(state.selectedDate);
+  document.getElementById("dailyTitle").textContent = longDate(parseKey(state.selectedDate));
+  document.getElementById("todoDateLabel").textContent = "Tareas - " + longDate(parseKey(state.selectedDate));
+
+  renderWeekStrip();
+  renderTodoList();
+
+  const editor = document.getElementById("notesEditor");
+  if (document.activeElement !== editor) {
+    editor.innerHTML = day.html || day.text || "";
+  }
+}
+
+function getStartOfWeek(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+
+function getWeekDates(baseKey) {
+  const start = getStartOfWeek(parseKey(baseKey));
+  const result = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    result.push(d);
+  }
+  return result;
+}
+
+function renderWeekStrip() {
+  const container = document.getElementById("weekStrip");
+  container.innerHTML = "";
+
+  getWeekDates(state.selectedDate).forEach(date => {
+    const key = formatDateKey(date);
+    const button = document.createElement("button");
+    button.className = "day-chip";
+    button.classList.toggle("active", key === state.selectedDate);
+    button.innerHTML = `<span>${shortDay(date)}</span><strong>${date.getDate()}</strong>`;
+
+    button.addEventListener("click", () => {
+      state.selectedDate = key;
+      saveLocal();
+      render();
+    });
+
+    container.appendChild(button);
+  });
+}
+
+function renderTodoList() {
+  const container = document.getElementById("todoList");
+  const day = getDayData(state.selectedDate);
+  container.innerHTML = "";
+
+  if (!day.tasks.length) {
+    container.innerHTML = `<div style="padding:15px; color:var(--muted); text-align:center; font-size:13px;">No hay tareas para este día.</div>`;
+    return;
+  }
+
+  day.tasks.forEach((task, index) => {
+    const row = document.createElement("div");
+    row.className = "todo-item" + (task.done ? " done" : "");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "todo-check";
+    checkbox.checked = !!task.done;
+    checkbox.onchange = () => {
+      task.done = checkbox.checked;
+      saveLocal();
+      renderTodoList();
+      queueDriveSync();
+    };
+
+    const text = document.createElement("div");
+    text.className = "todo-text";
+    text.contentEditable = "true";
+    text.textContent = task.text;
+    text.oninput = () => {
+      task.text = text.innerText;
+      saveLocal();
+      queueDriveSync();
+    };
+
+    const del = document.createElement("button");
+    del.className = "delete-task";
+    del.textContent = "×";
+    del.onclick = () => {
+      day.tasks.splice(index, 1);
+      saveLocal();
+      renderTodoList();
+      queueDriveSync();
+    };
+
+    row.append(checkbox, text, del);
+    container.appendChild(row);
+  });
+}
+
+function addDailyTask() {
+  const input = document.getElementById("taskInput");
+  const value = input.value.trim();
+  if (!value) return;
+
+  getDayData(state.selectedDate).tasks.push({ text: value, done: false });
+  input.value = "";
+  saveLocal();
+  renderTodoList();
+  queueDriveSync();
+}
+
+function renderGeneralTasks() {
+  const container = document.getElementById("generalTasks");
+  container.innerHTML = "";
+
+  state.generalTasks.forEach((task, index) => {
+    const row = document.createElement("div");
+    row.className = "general-task" + (task.done ? " done" : "");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = !!task.done;
+    checkbox.className = "todo-check";
+    checkbox.onchange = () => {
+      task.done = checkbox.checked;
+      saveLocal();
+      renderGeneralTasks();
+      queueDriveSync();
+    };
+
+    const name = document.createElement("div");
+    name.className = "task-name";
+    name.contentEditable = "true";
+    name.textContent = task.text;
+    name.oninput = () => {
+      task.text = name.innerText;
+      saveLocal();
+      queueDriveSync();
+    };
+
+    const del = document.createElement("button");
+    del.className = "delete-task";
+    del.textContent = "×";
+    del.onclick = () => {
+      state.generalTasks.splice(index, 1);
+      saveLocal();
+      renderGeneralTasks();
+      queueDriveSync();
+    };
+
+    row.append(checkbox, name, del);
+    container.appendChild(row);
+  });
+}
+
+function addGeneralTask() {
+  const input = document.getElementById("generalTaskInput");
+  const value = input.value.trim();
+  if (!value) return;
+
+  state.generalTasks.push({ text: value, done: false });
+  input.value = "";
+  saveLocal();
+  renderGeneralTasks();
+  queueDriveSync();
+}
+
+function renderPalette() {
+  const container = document.getElementById("palette");
+  container.innerHTML = "";
+
+  state.palette.forEach(item => {
+    const button = document.createElement("button");
+    button.className = "color-dot";
+    button.style.background = item.color;
+
+    const currentTargetColor = state.applyTarget === "text" ? state.selectedColor : state.selectedBgColor;
+    button.classList.toggle("active", item.color.toLowerCase() === currentTargetColor.toLowerCase());
+
+    button.onclick = () => {
+      if (state.applyTarget === "text") {
+        state.selectedColor = item.color;
+        document.execCommand("foreColor", false, item.color);
+      } else {
+        state.selectedBgColor = item.color;
+        document.execCommand("hiliteColor", false, item.color);
+      }
+      saveEditorContent();
+      renderPalette();
+    };
+
+    container.appendChild(button);
+  });
+}
+
+function saveEditorContent() {
+  const day = getDayData(state.selectedDate);
+  const editor = document.getElementById("notesEditor");
+  day.html = editor.innerHTML;
+  day.text = editor.innerText;
+  saveLocal();
+  renderWeek();
+  renderMonth();
+  queueDriveSync();
+}
+
+function renderWeek() {
+  const grid = document.getElementById("weekGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  getWeekDates(state.selectedDate).forEach(date => {
+    const key = formatDateKey(date);
+    const day = getDayData(key);
+
+    const card = document.createElement("article");
+    card.className = "week-card";
+
+    const header = document.createElement("div");
+    header.className = "week-card-header";
+    header.innerHTML = `<span>${shortDay(date)} ${date.getDate()}</span><small>${date.toLocaleDateString("es-ES", { month: "short" })}</small>`;
+    header.onclick = () => {
+      state.selectedDate = key;
+      switchTab("notesView");
+      saveLocal();
+      render();
+    };
+
+    const note = document.createElement("div");
+    note.className = "mini-note";
+    note.contentEditable = "true";
+    note.innerHTML = day.html || day.text || "";
+    note.oninput = () => {
+      day.html = note.innerHTML;
+      day.text = note.innerText;
+      saveLocal();
+      queueDriveSync();
+    };
+
+    card.append(header, note);
+    grid.appendChild(card);
+  });
+}
+
+function renderMonth() {
+  const grid = document.getElementById("monthGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  const selected = parseKey(state.selectedDate);
+  const year = selected.getFullYear();
+  const month = selected.getMonth();
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month + 1, 0);
+
+  const mondayOffset = first.getDay() === 0 ? 6 : first.getDay() - 1;
+  const totalCells = Math.ceil((mondayOffset + last.getDate()) / 7) * 7;
+
+  ["L", "M", "X", "J", "V", "S", "D"].forEach(name => {
+    const h = document.createElement("div");
+    h.className = "month-heading";
+    h.textContent = name;
+    grid.appendChild(h);
+  });
+
+  for (let i = 0; i < totalCells; i++) {
+    const dayNumber = i - mondayOffset + 1;
+    const cell = document.createElement("div");
+    cell.className = "month-cell";
+
+    if (dayNumber < 1 || dayNumber > last.getDate()) {
+      cell.classList.add("empty");
+      grid.appendChild(cell);
+      continue;
+    }
+
+    const date = new Date(year, month, dayNumber);
+    const key = formatDateKey(date);
+    const day = getDayData(key);
+
+    if (key === todayKey()) cell.classList.add("today");
+
+    const number = document.createElement("div");
+    number.className = "month-date";
+    number.textContent = dayNumber;
+
+    const note = document.createElement("div");
+    note.className = "month-note";
+    note.contentEditable = "true";
+    note.innerHTML = day.html || day.text || "";
+    note.oninput = () => {
+      day.html = note.innerHTML;
+      day.text = note.innerText;
+      saveLocal();
+      queueDriveSync();
+    };
+
+    cell.onclick = (e) => {
+      if (e.target === note) return;
+      state.selectedDate = key;
+      switchTab("notesView");
+      saveLocal();
+      render();
+    };
+
+    cell.append(number, note);
+    grid.appendChild(cell);
+  }
+}
+
+function renderThemes() {
+  const container = document.getElementById("themeList");
+  container.innerHTML = "";
+
+  getAllThemes().forEach(theme => {
+    const button = document.createElement("button");
+    button.className = "theme-option";
+    button.classList.toggle("active", theme.id === state.themeId);
+
+    const swatch = document.createElement("div");
+    swatch.className = "theme-swatch";
+    swatch.style.background = `linear-gradient(90deg, ${theme.primary} 0 35%, ${theme.soft} 35% 100%)`;
+
+    const name = document.createElement("span");
+    name.style.fontSize = "11px";
+    name.textContent = theme.name;
+
+    button.append(swatch, name);
+    button.onclick = () => {
+      state.themeId = theme.id;
+      saveLocal();
+      applyTheme();
+      renderThemes();
+      queueDriveSync();
+    };
+
+    container.appendChild(button);
+  });
+}
+
+/* SINCRONIZACIÓN GOOGLE */
+let driveSyncTimer = null;
+function setSyncStatus(t) { document.getElementById("syncStatus").textContent = t; }
+
+async function saveToDrive() {
+  setSyncStatus("Guardando...");
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(state)
+    });
+    setSyncStatus("Sincronizado");
+  } catch (err) { setSyncStatus("Error"); }
+}
+
+async function loadFromDrive() {
+  setSyncStatus("Cargando...");
+  try {
+    const response = await fetch(APPS_SCRIPT_URL);
+    const remote = await response.json();
+    if (remote && typeof remote === "object" && Object.keys(remote).length > 0) {
+      state = { ...state, ...remote, days: remote.days || {}, generalTasks: remote.generalTasks || [] };
+      saveLocal();
+      render();
+    }
+    setSyncStatus("Sincronizado");
+  } catch (err) { setSyncStatus("Local"); }
+}
+
+function queueDriveSync() {
+  clearTimeout(driveSyncTimer);
+  driveSyncTimer = setTimeout(saveToDrive, 1500);
+}
+
+/* NAVEGACIÓN Y CAMBIO DE PESTAÑA */
+function switchTab(targetViewId) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById(targetViewId).classList.add("active");
+
+  document.querySelectorAll(".bottom-nav .nav-item").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.target === targetViewId);
+  });
+
+  // Ocultar la barra de herramientas de formato salvo en notas
+  document.getElementById("toolRow").style.display = (targetViewId === "notesView") ? "flex" : "none";
+}
+
+document.querySelectorAll(".bottom-nav .nav-item[data-target]").forEach(btn => {
+  btn.onclick = () => switchTab(btn.dataset.target);
+});
+
+/* FORMATO BOTONES */
+document.getElementById("btnBold").onclick = () => { document.execCommand("bold"); saveEditorContent(); };
+document.getElementById("btnItalic").onclick = () => { document.execCommand("italic"); saveEditorContent(); };
+document.getElementById("btnUnderline").onclick = () => { document.execCommand("underline"); saveEditorContent(); };
+document.getElementById("btnStrike").onclick = () => { document.execCommand("strikeThrough"); saveEditorContent(); };
+
+document.getElementById("targetTextBtn").onclick = () => { state.applyTarget = "text"; render(); };
+document.getElementById("targetBgBtn").onclick = () => { state.applyTarget = "bg"; render(); };
+
+document.getElementById("datePicker").onchange = (e) => {
+  if (!e.target.value) return;
+  state.selectedDate = e.target.value;
+  saveLocal();
+  render();
+};
+
+document.getElementById("todayBtn").onclick = () => {
+  state.selectedDate = todayKey();
+  saveLocal();
+  render();
+};
+
+document.getElementById("notesEditor").oninput = saveEditorContent;
+document.getElementById("addTaskBtn").onclick = addDailyTask;
+document.getElementById("addGeneralTaskBtn").onclick = addGeneralTask;
+
+/* SIDEBAR EVENTS */
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("sidebarOverlay");
+
+document.getElementById("openSidebarBtn").onclick = () => { sidebar.classList.add("open"); overlay.classList.add("open"); };
+document.getElementById("closeSidebar").onclick = () => { sidebar.classList.remove("open"); overlay.classList.remove("open"); };
+overlay.onclick = () => { sidebar.classList.remove("open"); overlay.classList.remove("open"); };
+
+document.getElementById("googleSync").onclick = saveToDrive;
+
+/* INICIALIZACIÓN */
+loadLocal();
+applyTheme();
+render();
+loadFromDrive();
+</script>
+
+</body>
+</html>
